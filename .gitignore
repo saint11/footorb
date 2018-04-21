@@ -1,0 +1,4 @@
+game/*
+!game/assets/
+!game/lib/
+bin/*
