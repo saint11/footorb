@@ -14,6 +14,7 @@ love.load=()->
 	-- Engine Systems
 	require "systems/scene"
 	require "systems/entity"
+	require "systems/actor"
 
 	-- Game Scenes
 	require "scenes/mainMenu"
@@ -24,6 +25,9 @@ love.load=()->
 
 	-- Game objects
 	require "objects/player"
+	require "objects/orb"
+	require "objects/block"
+	require "objects/goal"
 
 	initLoveShortcuts!
 	initFonts!
@@ -44,6 +48,9 @@ love.load=()->
     export canvas = love.graphics.newCanvas(w_width, w_height)
     canvas\setFilter("nearest","nearest")
 
+    -- Debug
+    export debug_mode = false
+
 	changeSceneTo MainMenuScene()
 
 love.draw=()->
@@ -59,6 +66,12 @@ love.update=(dt)->
 
 love.keypressed=(key, scan, isrepeat)=>
 	currentScene\keypressed(key,scan,isrepeat)
+	if key=="`"
+		export debug_mode = not debug_mode
+		if debug_mode
+			lume.trace("Entering debug mode ", debug_mode)
+		else
+			lume.trace("Exiting debug mode ", debug_mode)
 
 -- Engine functions:
  

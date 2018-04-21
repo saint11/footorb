@@ -2,11 +2,18 @@
 -- You can include any other data variables in here like this: {variable}
 
 -- Game properties
-	esc_closes: false
-	show_scene_name: true
+	esc_closes: true
+	show_scene_name: false
+
+	room_size_x: 380
+	room_size_y: 200
+	door_size: 48
+
+	dungeon_size_x: 10
+	dungeon_size_y: 7
 
 -- Text
-	game_name: "Game Tittle"
+	game_name: "FootOrb"
 	author: "Pedro Medeiros"
 
 
