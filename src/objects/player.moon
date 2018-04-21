@@ -8,6 +8,7 @@ export class Player extends Actor
 		@room = {0, 0}
 
     update: (dt)=>
+    	super dt
     	lx, ly = 0, 0
 		if lk.isDown("left")
 			lx -= 1
@@ -28,12 +29,15 @@ export class Player extends Actor
 
 		@look_x, @look_y = lume.vector(@look_angle, 1)
 
+		-- Kick the ball !!!
 		if lk.isDown("space")
 			if @scene.orb.following==self
 				@scene.orb.following = nil
 				@scene.orb.speedX = @look_x * 200
 				@scene.orb.speedY = @look_y * 200
 				@scene.orb.speedZ = 60
+
+				@scene\camera_shake(2,0.2)
 
 		@room = {
 			x: math.floor(@x / data.global.room_size_x)

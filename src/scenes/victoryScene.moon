@@ -4,9 +4,13 @@ export class VictoryScene extends Scene
 		@fade_time = @fade_time_max
 
 	draw: ()=>
-		if (data.global.show_scene_name)
-			lg.setFont(data.fonts.min4)
-			lg.print "Victory scene",10,10
+		lg.setColor white
+		lg.setFont(data.fonts.extrude)
+
+		lg.printf getText("victory_title"),0, 50, w_width/2, "center", 0, 2, 2
+
+		lg.setFont(data.fonts.monocons)
+		lg.printf getText("victory_description"),0, 100, w_width, "center"
 
 		lg.setColor 0,0,0, @fade_time/@fade_time_max
 		lg.rectangle "fill", 0, 0, w_width, w_height

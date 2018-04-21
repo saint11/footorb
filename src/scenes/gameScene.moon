@@ -3,15 +3,17 @@ export class GameScene extends Scene
 		@entities = {}
 		@entities_to_add = {}
 		@entities_to_remove = {}
-		@camera = {x:0, y:0}
+		@camera = {x:0, y:0, shake_intensity:0, shake_time:0}
 
 		@generator = require("generator")
 		@generator\init(self)
 		@generator\make_dungeon!
 		
 	draw: ()=>
-		@camera.x = lume.lerp(@camera.x, @player.room.x*data.global.room_size_x + data.global.room_size_x/2 - w_width/2, 0.02)
-		@camera.y = lume.lerp(@camera.y, @player.room.y*data.global.room_size_y, 0.02)
+		shake_x = lume.random(-@camera.shake_intensity,@camera.shake_intensity) * math.min(@camera.shake_time,1)
+		shake_y = lume.random(-@camera.shake_intensity,@camera.shake_intensity) * math.min(@camera.shake_time,1)
+		@camera.x = lume.lerp(@camera.x, @player.room.x*data.global.room_size_x + data.global.room_size_x/2 - w_width/2, 0.02) + shake_x
+		@camera.y = lume.lerp(@camera.y, @player.room.y*data.global.room_size_y, 0.02) + shake_y
 
 		if (data.global.show_scene_name)
 			lg.setFont(data.fonts.min4)
@@ -43,14 +45,13 @@ export class GameScene extends Scene
 		for i,e in ipairs(@entities)
 			e\update(dt)
 
+		@camera.shake_time = math.max(@camera.shake_time-dt,0)
 
 	keypressed: (key, scan, isrepeat)=>
 		-- Pause
 		if key=="p"
 			changeSceneTo PauseScene(self)
 
-		if key=="v"
-			changeSceneTo VictoryScene()
 		if key=="d"
 			changeSceneTo DefeatScene()
 
@@ -81,3 +82,7 @@ export class GameScene extends Scene
 		x, y = @player.room.x, @player.room.y
 		lg.setColor(1,1,1,0.5)
 		lg.rectangle("fill",ui_x + 2 + x*(mm_size+1), ui_y + 2 + y*(mm_size+1), mm_size, mm_size)
+
+	camera_shake: (ammount, time)=>
+		@camera.shake_intensity = math.max(@camera.shake_intensity, ammount)
+		@camera.shake_time = math.max(@camera.shake_time, time)

@@ -5,9 +5,15 @@ export class Entity
 
 		@ox, @oy = 0, 0
 
-    update: (dt)=>
+		@tweens={}
 
-	draw: ()=>
+    update: (dt)=>
+    	for i,t in lume.ripairs(@tweens)
+    		if t\update(dt)
+    			@tweens[i] =nil
+
+	add_tween:(...)=>
+		lume.push(@tweens,tween.new(...))
 
 	removeSelf:()=>
 		@scene.remove(self)

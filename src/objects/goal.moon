@@ -7,10 +7,23 @@ export class Goal extends Actor
 
 		@time = 0
 
+		@end_timer = 3
+
+
 	update:(dt)=>
+		super dt
 		@time+=dt
-		if @collide_with(@x,@y, "orb")
+		orb = @collide_with(@x,@y, "orb")
+		if orb != nil
 			@score=true
+			orb\on_hit_goal()
+
+		if @score
+			@end_timer-=dt
+
+		if @end_timer<=0
+			changeSceneTo VictoryScene()
+
 			
 	draw:(rx, ry)=>
 		if @score

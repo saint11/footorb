@@ -23,6 +23,9 @@
 	credits: "Credits"
 	exit: "Exit"
 
+	victory_title: "Victory!"
+	victory_description: "The holy cup is yours!"
+
 	footnote: "A game by {author}"
 
 	-- game

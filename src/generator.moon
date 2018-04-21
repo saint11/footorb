@@ -73,13 +73,15 @@
 		if room.door_right
 			@s\add(Block(x + w-16,y + h/2 - door_w/2,16,door_w))
 
+		-- Spawn objects
 		if room.style == "start"
 			@s.player = @s\add(Player((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb = @s\add(Orb((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb.following = @s.player
-			@s\add(Goal((room.x + 0.5)*w, (room.y + 0.1)*h))
+			@s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
 		elseif room.style == "exit"
-			@s\add(Goal((room.x + 0.5)*w, (room.y + 0.1)*h))
+			@s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
+
 
 	make_branch:( x, y, size, name )=>
 		print("  building '".. name .. "' branch with " .. size .. " rooms")

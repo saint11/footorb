@@ -4,6 +4,7 @@ io.stdout\setvbuf("no")
 love.load=()->
 	-- external libs
 	export lume = require "lib/lume"
+	export tween  = require "lib/tween"
 
 	-- Game data
 	export data = {}
