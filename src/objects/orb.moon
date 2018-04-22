@@ -18,19 +18,23 @@ export class Orb extends Actor
 
 		@hit_goal = false
 
+		@evil = false
+		@immune = 0
 
     update: (dt)=>
     	super dt
 
     	@bounce_cooldown = math.max(0, @bounce_cooldown - dt)
+    	@immune = math.max(0, @immune - dt)
 		@speedZ -= dt * 150
 		@z = math.max(0,@z + @speedZ * dt)
 		if not @hit_goal
-			-- Bounce on the groung
+			-- Bounce on the ground
 			if @z==0
 				@speedZ = -@speedZ * 0.8
 				@speedX *= 0.5
 				@speedY *= 0.5
+				@evil = false
 				if math.abs(@speedZ)<=0.5
 					@speedZ = 0
 
@@ -56,6 +60,13 @@ export class Orb extends Actor
 			else
 				@move(@speedX * dt, @speedY * dt)
 
+				-- if is evil
+				if @evil
+					player = @collide_with(@x,@y, "player")
+					if player != nil
+						player\injure()
+						@evil = false
+
 				-- is the player around
 				if isCloser(@x, @y, @scene.player.x, @scene.player.y, 10) and @bounce_cooldown==0
 					@following = @scene.player
@@ -64,7 +75,14 @@ export class Orb extends Actor
 		lg.setColor .2,.2,.2,.5
 		lg.circle "fill", x, y, 5 * @scale
 
-		lg.setColor white
+		if @evil
+			lg.setColor 1,0,0,1
+		else
+			lg.setColor white
+
+		if @immune>0
+			lg.setColor 1, 1, math.floor(time*200)%2, 1
+
 		lg.circle "fill", x, y - @z, 5 * @scale
 
 	on_collidedX:()=>
@@ -83,3 +101,12 @@ export class Orb extends Actor
 			@scene\camera_shake(2.5,1)
 			@hit_goal = true
 			@add_tween(1, self, {scale: 0}, "inBack")
+
+	kick:(sx, sy)=>
+		@following = nil
+		@speedX = sx
+		@speedY = sy
+		@speedZ = 60
+		@z = 1
+
+		@scene\camera_shake(2,0.2)

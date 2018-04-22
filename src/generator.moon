@@ -19,7 +19,7 @@
 				door_up:true, door_down:true, door_left:true, door_right:true
 			}
 			lume.push(@rooms, @start_room)
-			sucessful,main_branch = @make_branch(lume.round(w/2), lume.round(h/2), 4, "main")
+			sucessful,main_branch = @make_branch(lume.round(w/2), lume.round(h/2), 3, "main")
 			if sucessful
 				-- Level Exit
 				main_branch[#main_branch].style = "exit"
@@ -78,10 +78,17 @@
 			@s.player = @s\add(Player((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb = @s\add(Orb((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb.following = @s.player
+		
 		elseif room.style == "exit"
-			@s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
+			goal = @s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
+			@s\add(Ghoulie((room.x + 0.25)*w, (room.y + 0.08)*h+24, goal))
+		
 		else
-			@s\add(Attacker((room.x + 0.5)*w, (room.y + 0.5)*h))
+			r = lume.randomchoice({"Attacker","Attacker", "Stealer"})
+			if r == "Attacker"
+				@s\add(Attacker((room.x + 0.5)*w, (room.y + 0.5)*h))
+			elseif r == "Stealer"
+				@s\add(Stealer((room.x + 0.5)*w, (room.y + 0.5)*h))
 
 
 	make_branch:( x, y, size, name )=>

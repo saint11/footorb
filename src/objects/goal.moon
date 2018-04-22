@@ -1,7 +1,8 @@
 export class Goal extends Actor
 	new:(x,y)=>
 		super(x, y)
-		@box= { x:-24, y:-8, w:48, h:16}
+		width = 80
+		@box = { x:-width/2, y:-8, w:width, h:16}
 		@depth = -100
 		@score = false
 

@@ -4,34 +4,50 @@ export class Player extends Actor
 		@speed = 80
 		@look_angle = 0
 		@look_x, @look_y = 0, 0
-		@box = { x:-5, y:-8, w:10, h:8 }
+		@box = { x:-6, y:-10, w:12, h:10 }
 		
 		@last_room = {}
+		@have_kicked = false
 
 		@tags = {player: true}
 		@injured = false
+
+		@dash_timer=0
+		@dash_to = { x:0, y:0 }
 
 	update: (dt)=>
 		super dt
 
 		lx, ly, kicked = @update_controls()
-		
-		-- if I moved
-		if lx != 0 or ly != 0
-			@look_angle = angleLerp(@look_angle, lume.angle(0,0,lx,ly), 5*dt)
-			@move(lx*@speed*dt, ly*@speed*dt)
 
-		@look_x, @look_y = lume.vector(@look_angle, 1)
+		-- Dashing though!
+		if @dash_timer>0
+			sx, sy = @dash_to.x*@speed*@dash_timer*0.55, @dash_to.y*@speed*@dash_timer*0.55
+			@move(sx*sx*dt*lume.sign(sx), sy*sy*dt*lume.sign(sy))
+			@dash_timer = math.max(@dash_timer-dt, 0)
 
-		-- Kick the ball !!!
-		if kicked
-			if @scene.orb.following==self
-				@scene.orb.following = nil
-				@scene.orb.speedX = @look_x * 200
-				@scene.orb.speedY = @look_y * 200
-				@scene.orb.speedZ = 60
+			orb = @collide_with(@x,@y, "orb")
+			if orb != nil and not orb.evil
+				orb.following=self
+				orb.immune = 1.5
+		else
+			-- if I moved
+			if lx != 0 or ly != 0
+				@look_angle = angleLerp(@look_angle, lume.angle(0,0,lx,ly), 5*dt)
+				@move(lx*@speed*dt, ly*@speed*dt)
 
-				@scene\camera_shake(2,0.2)
+			@look_x, @look_y = lume.vector(@look_angle, 1)
+
+			-- Kick the ball !!!
+			if kicked and not @have_kicked
+				if @scene.orb.following==self
+					@scene.orb\kick(@look_x * 200,@look_y * 200)
+
+				elseif (lx != 0 or ly != 0) and @dash_timer == -0.5
+					@dash_to = { x:lx, y:ly }
+					@dash_timer = 0.5
+			else
+				@dash_timer = math.max(@dash_timer-dt, -0.5)
 
 		@room.x = math.floor(@x / data.global.room_size_x)
 		@room.y = math.floor(@y / data.global.room_size_y)
@@ -41,6 +57,7 @@ export class Player extends Actor
 			@last_room.y = @room.y
 			@scene\toggle_active_room(@room.x,@room.y)
 
+		@have_kicked = kicked
 	update_controls:()=>
 		lx, ly = 0, 0
 		kicked = false
@@ -58,7 +75,7 @@ export class Player extends Actor
 				ly += 1
 
 			kicked = lk.isDown("space")
-
+		lx, ly = normalize(lx, ly)
 		return lx, ly, kicked
 
 	injure: ()=>
@@ -69,7 +86,8 @@ export class Player extends Actor
 
 	draw: (x, y)=>
 		lg.setColor 0.2, 0.8, 0.5, 1
-		lg.rectangle "fill", x - 8, y - 24, 16, 24
+		w, h = 16*(1+math.max(@dash_timer,0)*0.5), 24*(1-math.max(@dash_timer,0)*0.5)
+		lg.rectangle "fill", x - w/2, y - h, w, h
 
 		lg.setColor 0.8, 0.8, 0.2, 0.5
 		lg.circle "fill", x, y, 4

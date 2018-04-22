@@ -29,8 +29,12 @@ love.load=()->
 	require "objects/orb"
 	require "objects/block"
 	require "objects/goal"
-	require "objects/attacker"
 	require "objects/fx"
+	-- Enemies
+	require "objects/attacker"
+	require "objects/ghoulie"
+	require "objects/stealer"
+
 
 	initLoveShortcuts!
 	initFonts!
@@ -38,7 +42,7 @@ love.load=()->
 	-- Window size and border
     export w_width = 380
     export w_height = 240
-    export s_scale = 2
+    export s_scale = 1.5
 
     -- Colors
     export white = {255,255,255,255}
@@ -62,6 +66,7 @@ love.draw=()->
 	post_draw!
 
 love.update=(dt)->
+	time += dt
 	currentScene\update(dt)
 	if lk.isDown("escape") and data.global.esc_closes
 		love.event.quit!
@@ -92,6 +97,7 @@ export initLoveShortcuts=->
 	export lg = love.graphics
 	export lm = love.math
 	export lk = love.keyboard
+	export time = 0
 
 export initFonts=->
 	-- You can comment out the fonts you won't use to save up loading time
