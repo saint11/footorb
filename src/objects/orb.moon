@@ -1,6 +1,7 @@
 export class Orb extends Actor 
 	new: (x, y)=>
 		super(x, y)
+
 		@z = 0
 		@scale = 1
 
@@ -13,8 +14,10 @@ export class Orb extends Actor
 		
 		@box = {x:-4,y:-4,w:8,h:8}
 		@tags = {orb:true}
+		@fade=false
 
 		@hit_goal = false
+
 
     update: (dt)=>
     	super dt

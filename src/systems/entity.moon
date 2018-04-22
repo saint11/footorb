@@ -4,6 +4,7 @@ export class Entity
 		@y = y
 
 		@ox, @oy = 0, 0
+		@depth = 0
 
 		@tweens={}
 
@@ -15,5 +16,8 @@ export class Entity
 	add_tween:(...)=>
 		lume.push(@tweens,tween.new(...))
 
-	removeSelf:()=>
-		@scene.remove(self)
+	remove_self:()=>
+		@scene\remove(self)
+
+	draw:(x,y)=>
+	post_draw:(x,y)=>

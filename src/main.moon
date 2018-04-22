@@ -29,6 +29,8 @@ love.load=()->
 	require "objects/orb"
 	require "objects/block"
 	require "objects/goal"
+	require "objects/attacker"
+	require "objects/fx"
 
 	initLoveShortcuts!
 	initFonts!

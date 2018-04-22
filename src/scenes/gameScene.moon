@@ -26,6 +26,10 @@ export class GameScene extends Scene
 				e\debug_draw(rx, ry)
 		@draw_ui!
 
+		for i,e in ipairs(@entities)
+			rx, ry = lume.round(e.x) - lume.round(@camera.x) + e.ox, lume.round(e.y) - lume.round(@camera.y) + e.oy
+			e\post_draw(rx, ry)
+
 	update: (dt)=>
 
 		-- remove entities
@@ -43,7 +47,7 @@ export class GameScene extends Scene
 
 		-- run update loop
 		for i,e in ipairs(@entities)
-			e\update(dt)
+			if e.active != false then e\update(dt)
 
 		@camera.shake_time = math.max(@camera.shake_time-dt,0)
 
@@ -83,6 +87,17 @@ export class GameScene extends Scene
 		lg.setColor(1,1,1,0.5)
 		lg.rectangle("fill",ui_x + 2 + x*(mm_size+1), ui_y + 2 + y*(mm_size+1), mm_size, mm_size)
 
+	fade_to:(where, time)=>
+		@add(FadeOut(where, time))
+
 	camera_shake: (ammount, time)=>
 		@camera.shake_intensity = math.max(@camera.shake_intensity, ammount)
 		@camera.shake_time = math.max(@camera.shake_time, time)
+
+	toggle_active_room:(x, y)=>
+		for _,e in pairs(@entities)
+			if e.room != nil and e.fade
+				if e.room.x != x or e.room.y != y
+					e.active=false
+				else
+					e.active=true

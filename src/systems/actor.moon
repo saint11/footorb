@@ -1,13 +1,15 @@
 export class Actor extends Entity
-	new: (x, y, room)=>
+	new: (x, y)=>
 		super(x, y)
 		@dx, @dy = 0, 0
 		@box = {x:0,y:0,w:16,h:16}
-		@room = room
-
-		@depth = 0
-
+		@room = {
+			x: math.floor(@x / data.global.room_size_x)
+			y: math.floor(@y / data.global.room_size_y)
+		}
+		
 		@active = true
+		@fade = true
 
 	collide:(x,y,tag)=>
 		return @collide_with(x,y,tag)
@@ -62,3 +64,7 @@ export class Actor extends Entity
 	debug_draw:(x, y)=>
 		lg.setColor 1, 0, 0, 1
 		lg.rectangle("line", x + @box.x, y + @box.y, @box.w, @box.h)
+
+		lg.setFont(data.fonts.min5)
+		lg.setColor 1, 1, 1, 1
+		love.graphics.print(@room.x..","..@room.y, x, y + 8)

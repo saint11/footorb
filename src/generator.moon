@@ -78,9 +78,10 @@
 			@s.player = @s\add(Player((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb = @s\add(Orb((room.x + 0.5)*w, (room.y + 0.5)*h))
 			@s.orb.following = @s.player
-			@s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
 		elseif room.style == "exit"
 			@s\add(Goal((room.x + 0.25)*w, (room.y + 0.08)*h))
+		else
+			@s\add(Attacker((room.x + 0.5)*w, (room.y + 0.5)*h))
 
 
 	make_branch:( x, y, size, name )=>

@@ -5,22 +5,16 @@ export class Player extends Actor
 		@look_angle = 0
 		@look_x, @look_y = 0, 0
 		@box = { x:-5, y:-8, w:10, h:8 }
-		@room = {0, 0}
+		
+		@last_room = {}
 
-    update: (dt)=>
-    	super dt
-    	lx, ly = 0, 0
-		if lk.isDown("left")
-			lx -= 1
+		@tags = {player: true}
+		@injured = false
 
-		if lk.isDown("right")
-			lx += 1
+	update: (dt)=>
+		super dt
 
-    	if lk.isDown("up")
-			ly -= 1
-
-		if lk.isDown("down")
-			ly += 1
+		lx, ly, kicked = @update_controls()
 		
 		-- if I moved
 		if lx != 0 or ly != 0
@@ -30,7 +24,7 @@ export class Player extends Actor
 		@look_x, @look_y = lume.vector(@look_angle, 1)
 
 		-- Kick the ball !!!
-		if lk.isDown("space")
+		if kicked
 			if @scene.orb.following==self
 				@scene.orb.following = nil
 				@scene.orb.speedX = @look_x * 200
@@ -39,10 +33,39 @@ export class Player extends Actor
 
 				@scene\camera_shake(2,0.2)
 
-		@room = {
-			x: math.floor(@x / data.global.room_size_x)
-			y: math.floor(@y / data.global.room_size_y)
-		}
+		@room.x = math.floor(@x / data.global.room_size_x)
+		@room.y = math.floor(@y / data.global.room_size_y)
+		if @room.x != @last_room.x or @room.y != @last_room.y
+			print "Changed Rooms! (Now in " .. @room.x .. "," .. @room.y .. ")"
+			@last_room.x = @room.x
+			@last_room.y = @room.y
+			@scene\toggle_active_room(@room.x,@room.y)
+
+	update_controls:()=>
+		lx, ly = 0, 0
+		kicked = false
+		if not @injured
+			if lk.isDown("left")
+				lx -= 1
+
+			if lk.isDown("right")
+				lx += 1
+
+	    	if lk.isDown("up")
+				ly -= 1
+
+			if lk.isDown("down")
+				ly += 1
+
+			kicked = lk.isDown("space")
+
+		return lx, ly, kicked
+
+	injure: ()=>
+		if not @injured
+			@scene\camera_shake(2,3)
+			@scene\fade_to(DefeatScene(),2)
+			@injured = true
 
 	draw: (x, y)=>
 		lg.setColor 0.2, 0.8, 0.5, 1
