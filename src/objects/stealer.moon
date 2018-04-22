@@ -2,20 +2,34 @@ export class Stealer extends Actor
 	new:(x,y)=>
 		super(x,y)
 		@speed = 30
+		@collides_with = {"solid","door"}
+		
+		@dangerous = true
 
+		@hp = 1
+		@has_ball = false
 	update:(dt)=>
 		super(dt)
 		if @scene.orb.following != self
+			if @has_ball
+				@has_ball = false
+				@hp -= 1
+				if @hp==0
+					@remove_self()
+
 			move_x, move_y = normalize @scene.orb.x - @x, @scene.orb.y - @y
 			@move(move_x*dt * @speed, move_y*dt * @speed)
 
+			-- Got the orb!
 			orb = @collide_with(@x,@y, "orb")
 			if orb != nil and orb.immune==0
 				@look_x, @look_y = 0, 0
 				orb.following = self
 				orb.speedX = 0
 				orb.speedY = 0
+				orb.rate = 0.75
 		else
+			@has_ball = true
 			move_x, move_y = normalize @scene.player.x - @x, @scene.player.y - @y
 			@move(-move_x*dt * @speed, -move_y*dt * @speed)
 			@look_x, @look_y = -move_x, -move_y

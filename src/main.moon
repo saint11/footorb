@@ -42,7 +42,7 @@ love.load=()->
 	-- Window size and border
     export w_width = 380
     export w_height = 240
-    export s_scale = 1.5
+    export s_scale = 2
 
     -- Colors
     export white = {255,255,255,255}

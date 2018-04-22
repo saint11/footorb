@@ -2,7 +2,7 @@ export class Ghoulie extends Actor
 	new:(x,y, goal)=>
 		super(x,y)
 		@goal = goal
-		@speed = 20
+		@speed = 25
 		@box = {x:-10, y:-5, w:20, h:10}
 		@time = 0
 

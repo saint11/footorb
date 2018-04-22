@@ -51,6 +51,10 @@ export class GameScene extends Scene
 
 		@camera.shake_time = math.max(@camera.shake_time-dt,0)
 
+		-- check if room is safe
+		if @is_room_safe()
+			@broadcast("open_doors")
+
 	keypressed: (key, scan, isrepeat)=>
 		-- Pause
 		if key=="p"
@@ -95,9 +99,22 @@ export class GameScene extends Scene
 		@camera.shake_time = math.max(@camera.shake_time, time)
 
 	toggle_active_room:(x, y)=>
+		@broadcast("close_doors",x,y)
 		for _,e in pairs(@entities)
 			if e.room != nil and e.fade
 				if e.room.x != x or e.room.y != y
 					e.active=false
 				else
 					e.active=true
+
+	is_room_safe:()=>
+		x, y = @player.room.x, @player.room.y
+		for _,e in pairs(@entities)
+			if e.dangerous ~= nil and e.dangerous and e.room.x==x and e.room.y==y
+				return false
+		return true
+
+	broadcast:(message,...)=>
+		for _,e in pairs(@entities)
+			if e[message]~=nil and type(e[message])=="function"
+				e[message](e, ...)

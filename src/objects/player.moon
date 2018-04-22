@@ -10,10 +10,14 @@ export class Player extends Actor
 		@have_kicked = false
 
 		@tags = {player: true}
-		@injured = false
 
 		@dash_timer=0
 		@dash_to = { x:0, y:0 }
+
+		@hp = 4
+		@hit_timer=0
+		@hit_to = { x:0, y:0}
+		@invulnerable=0
 
 	update: (dt)=>
 		super dt
@@ -21,13 +25,23 @@ export class Player extends Actor
 		lx, ly, kicked = @update_controls()
 
 		-- Dashing though!
-		if @dash_timer>0
+		if @hit_timer>0
+			sx, sy = @hit_to.x*@speed*0.55, @hit_to.y*@speed*0.55
+			@move(sx*dt, sy*dt)
+			@hit_to.x = math.max(@hit_to.x - 3, 0)
+			@hit_to.y = math.max(@hit_to.y - 3, 0)
+			@hit_timer = math.max(@hit_timer-dt, 0)
+
+		elseif @dash_timer>0
 			sx, sy = @dash_to.x*@speed*@dash_timer*0.55, @dash_to.y*@speed*@dash_timer*0.55
 			@move(sx*sx*dt*lume.sign(sx), sy*sy*dt*lume.sign(sy))
 			@dash_timer = math.max(@dash_timer-dt, 0)
 
+			-- Got the ball!
 			orb = @collide_with(@x,@y, "orb")
 			if orb != nil and not orb.evil
+				orb.rate = 1
+				orb.collides_with = {"solid"}
 				orb.following=self
 				orb.immune = 1.5
 		else
@@ -57,11 +71,13 @@ export class Player extends Actor
 			@last_room.y = @room.y
 			@scene\toggle_active_room(@room.x,@room.y)
 
+		@invulnerable = math.max(@invulnerable-dt,0)
 		@have_kicked = kicked
+
 	update_controls:()=>
 		lx, ly = 0, 0
 		kicked = false
-		if not @injured
+		if @hit_timer == 0
 			if lk.isDown("left")
 				lx -= 1
 
@@ -78,14 +94,23 @@ export class Player extends Actor
 		lx, ly = normalize(lx, ly)
 		return lx, ly, kicked
 
-	injure: ()=>
-		if not @injured
+	injure: (x, y)=>
+		if @invulnerable==0 and @dash_timer<=-0.1
 			@scene\camera_shake(2,3)
-			@scene\fade_to(DefeatScene(),2)
-			@injured = true
+			@invulnerable = 1.5
+			@hit_timer = 0.7
+			@hit_to.x, @hit_to.y = normalize x-@x, y-@y
+			
+			@hp -= 1
+			if @hp==0
+				@scene\fade_to(DefeatScene(),2)
 
 	draw: (x, y)=>
 		lg.setColor 0.2, 0.8, 0.5, 1
+		if @invulnerable>0
+			f = math.floor(@invulnerable*30)%2
+			lg.setColor(1-f,0.8,0.5,1)
+
 		w, h = 16*(1+math.max(@dash_timer,0)*0.5), 24*(1-math.max(@dash_timer,0)*0.5)
 		lg.rectangle "fill", x - w/2, y - h, w, h
 

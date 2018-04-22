@@ -18,8 +18,12 @@ export class Orb extends Actor
 
 		@hit_goal = false
 
+		@shooting = false
 		@evil = false
 		@immune = 0
+		
+		@rate = 1
+		@respawn = 5
 
     update: (dt)=>
     	super dt
@@ -35,6 +39,7 @@ export class Orb extends Actor
 				@speedX *= 0.5
 				@speedY *= 0.5
 				@evil = false
+				@shooting = false
 				if math.abs(@speedZ)<=0.5
 					@speedZ = 0
 
@@ -43,10 +48,6 @@ export class Orb extends Actor
 				target_x = @following.x + @following.look_x * 24
 				target_y = @following.y + @following.look_y * 24
 
-				if not isCloser(@x, @y, target_x, target_y, 8) and @bounce_cooldown==0 and @z==0
-					@speedZ = -60
-					@bounce_cooldown=2
-
 				mx = 0
 				if math.abs(target_x - @x) > 2
 					mx = lume.sign(target_x - @x) * math.min(math.abs(target_x - @x)*15, 200)
@@ -54,11 +55,26 @@ export class Orb extends Actor
 				if math.abs(target_y - @y) > 2
 					my = lume.sign(target_y - @y) * math.min(math.abs(target_y - @y)*15, 200)
 
-				@move(mx * dt, my * dt)
+				@move(mx * dt * @rate, my * dt * @rate)
+
+				if not isCloser(@x, @y, target_x, target_y, 8)
+					if not isCloser(@x, @y, target_x, target_y, 32)
+						@following=nil
+					if @bounce_cooldown==0 and @z==0
+						@speedZ = -60
+						@bounce_cooldown=2
 
 			-- Move around
 			else
 				@move(@speedX * dt, @speedY * dt)
+
+				if math.abs(@speedX)<=0.1 and math.abs(@speedY)<=0.1
+					@respawn = math.max(@respawn-dt, 0)
+				if @respawn == 0
+					print "Orb respawned!"
+					@respawn = 5
+					@speedX, @speedY = 0, 0
+					@x, @y = (@scene.player.room.x + 0.5) * data.global.room_size_x, (@scene.player.room.y + 0.5) * data.global.room_size_y
 
 				-- if is evil
 				if @evil
@@ -68,8 +84,10 @@ export class Orb extends Actor
 						@evil = false
 
 				-- is the player around
-				if isCloser(@x, @y, @scene.player.x, @scene.player.y, 10) and @bounce_cooldown==0
+				if isCloser(@x, @y, @scene.player.x, @scene.player.y, 14) and @bounce_cooldown==0
+					@rate = 1
 					@following = @scene.player
+					@collides_with = {"solid"}
 					@bounce_cooldown=2
 	draw: (x, y)=>
 		lg.setColor .2,.2,.2,.5
@@ -103,10 +121,11 @@ export class Orb extends Actor
 			@add_tween(1, self, {scale: 0}, "inBack")
 
 	kick:(sx, sy)=>
+		@shooting = true
 		@following = nil
 		@speedX = sx
 		@speedY = sy
 		@speedZ = 60
 		@z = 1
-
+		@collides_with = {"solid", "door"}
 		@scene\camera_shake(2,0.2)

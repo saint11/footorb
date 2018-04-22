@@ -50,28 +50,36 @@
 		door_w = data.global.door_size
 
 		-- top wall
-		@s\add(Block(x, y, w/2 - door_w/2, 16))
-		@s\add(Block(x + w/2 + door_w/2, y, w/2 - door_w/2, 16))
+		@s\add(Block(x, y, w/2 - door_w/2, 16, room.x, room.y))
+		@s\add(Block(x + w/2 + door_w/2, y, w/2 - door_w/2, 16, room.x, room.y))
 		if room.door_up
-			@s\add(Block(x + w/2 - door_w/2, y, door_w, 16))
+			@s\add(Block(x + w/2 - door_w/2, y, door_w, 16, room.x, room.y))
+		else
+			@s\add(Door(x + w/2 - door_w/2, y, door_w, 16, room.x, room.y))
 
 		-- -- bottom wall
-		@s\add(Block(x,y+h-16,w/2 - door_w/2,16))
-		@s\add(Block(x + w/2 + door_w/2, y+h-16, w/2 - door_w/2, 16))
+		@s\add(Block(x,y+h-16,w/2 - door_w/2,16, room.x, room.y))
+		@s\add(Block(x + w/2 + door_w/2, y+h-16, w/2 - door_w/2, 16, room.x, room.y))
 		if room.door_down
-			@s\add(Block(x + w/2 - door_w/2, y+h-16, door_w, 16))
+			@s\add(Block(x + w/2 - door_w/2, y+h-16, door_w, 16, room.x, room.y))
+		else
+			@s\add(Door(x + w/2 - door_w/2, y+h-16, door_w, 16, room.x, room.y))
 
 		-- -- left wall
-		@s\add(Block(x,y+16,16,h/2 - door_w/2 - 16))
-		@s\add(Block(x,y + h/2 + door_w/2,16,h/2 - door_w/2 - 16))
+		@s\add(Block(x,y+16,16,h/2 - door_w/2 - 16, room.x, room.y))
+		@s\add(Block(x,y + h/2 + door_w/2,16,h/2 - door_w/2 - 16, room.x, room.y))
 		if room.door_left
-			@s\add(Block(x,y + h/2 - door_w/2,16,door_w))
+			@s\add(Block(x,y + h/2 - door_w/2,16,door_w, room.x, room.y))
+		else
+			@s\add(Door(x,y + h/2 - door_w/2,16,door_w, room.x, room.y))
 
 		-- -- right wall
-		@s\add(Block(x + w-16, y+16,16,h/2 - door_w/2 - 16))
-		@s\add(Block(x + w-16, y + h/2 + door_w/2,16,h/2 - door_w/2 - 16))
+		@s\add(Block(x + w-16, y+16,16,h/2 - door_w/2 - 16, room.x, room.y))
+		@s\add(Block(x + w-16, y + h/2 + door_w/2,16,h/2 - door_w/2 - 16, room.x, room.y))
 		if room.door_right
-			@s\add(Block(x + w-16,y + h/2 - door_w/2,16,door_w))
+			@s\add(Block(x + w-16,y + h/2 - door_w/2,16,door_w, room.x, room.y))
+		else
+			@s\add(Door(x + w-16,y + h/2 - door_w/2,16,door_w, room.x, room.y))
 
 		-- Spawn objects
 		if room.style == "start"
@@ -84,11 +92,18 @@
 			@s\add(Ghoulie((room.x + 0.25)*w, (room.y + 0.08)*h+24, goal))
 		
 		else
-			r = lume.randomchoice({"Attacker","Attacker", "Stealer"})
+			r = lume.randomchoice({"Attacker","Attacker", "Both", "Trio"})
 			if r == "Attacker"
 				@s\add(Attacker((room.x + 0.5)*w, (room.y + 0.5)*h))
 			elseif r == "Stealer"
 				@s\add(Stealer((room.x + 0.5)*w, (room.y + 0.5)*h))
+			elseif r == "Both"
+				@s\add(Attacker((room.x + 0.25)*w, (room.y + 0.25)*h))
+				@s\add(Stealer((room.x + 0.75)*w, (room.y + 0.75)*h))
+			elseif r == "Trio"
+				@s\add(Attacker((room.x + 0.25)*w, (room.y + 0.25)*h))
+				@s\add(Attacker((room.x + 0.75)*w, (room.y + 0.25)*h))
+				@s\add(Stealer((room.x + 0.75)*w, (room.y + 0.75)*h))
 
 
 	make_branch:( x, y, size, name )=>

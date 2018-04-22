@@ -3,6 +3,7 @@ export class Actor extends Entity
 		super(x, y)
 		@dx, @dy = 0, 0
 		@box = {x:0,y:0,w:16,h:16}
+		@collides_with = {"solid"}
 		@room = {
 			x: math.floor(@x / data.global.room_size_x)
 			y: math.floor(@y / data.global.room_size_y)
@@ -11,12 +12,11 @@ export class Actor extends Entity
 		@active = true
 		@fade = true
 
-	collide:(x,y,tag)=>
-		return @collide_with(x,y,tag)
-
-	collide_with:(x, y, tag)=>
+	collide_with:(x, y, tags)=>
+		if type(tags) != "table"
+			tags = {tags}
 		for k,o in pairs(@scene.entities)
-			if o!=self and o.tags!=nil and o.tags[tag]==true and o.active
+			if o!=self and o.tags!=nil and lume.any(tags,(x)->return o.tags[x]==true) and o.active
 				if intersects(
 					{x: x + @box.x, y: y + @box.y, w: @box.w, h: @box.h},
 					{x: o.x + o.box.x, y: o.y + o.box.y, w: o.box.w, h: o.box.h})
@@ -33,7 +33,7 @@ export class Actor extends Entity
 		signY = lume.sign(@dy)
 
 		while bufferX>1 do
-			other = @collide_with(@x+signX,@y,"solid")
+			other = @collide_with(@x+signX,@y, @collides_with)
 			if other!=nil then
 				bufferX=0
 				if @on_collide~=nil then @on_collide(other)
@@ -46,7 +46,7 @@ export class Actor extends Entity
 				@x = @x + signX
 
 		while bufferY>1 do
-			other = @collide_with(@x,@y+signY,"solid")
+			other = @collide_with(@x,@y+signY,@collides_with)
 			if other~=nil then
 				bufferY=0
 				if @on_collide~=nil then @on_collide(other)

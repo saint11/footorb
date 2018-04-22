@@ -38,3 +38,6 @@ export normalize=(x,y)->
 		return 0,0,0
 	else
 		return x/l,y/l,l
+
+export clamp=(v,max)->
+	return math.min(math.abs(v),max) * lume.sign(v)
