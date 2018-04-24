@@ -44,6 +44,8 @@ love.load=()->
     export w_height = 240
     export s_scale = 2
 
+    export time_scale = 1
+
     -- Colors
     export white = {255,255,255,255}
     export black = {0,0,0,255}
@@ -67,7 +69,15 @@ love.draw=()->
 
 love.update=(dt)->
 	time += dt
-	currentScene\update(dt)
+	export time_scale
+	
+	if not currentScene.started
+		currentScene\start!
+		currentScene.started=true
+	currentScene\update(dt*time_scale)
+	
+
+	time_scale = lume.lerp(time_scale, 1, 0.015)
 	if lk.isDown("escape") and data.global.esc_closes
 		love.event.quit!
 
@@ -126,3 +136,6 @@ export post_draw=->
 	lg.setCanvas!
 	lg.setColor white
 	lg.draw canvas, 0, 0, 0, s_scale, s_scale
+
+export slowdown=(ammount)->
+	export time_scale = ammount

@@ -19,6 +19,10 @@ export class Player extends Actor
 		@hit_to = { x:0, y:0}
 		@invulnerable=0
 
+	start:()=>
+		@scene.camera.x = @room.x*data.global.room_size_x + data.global.room_size_x/2 - w_width/2
+		@scene.camera.y = @room.y*data.global.room_size_y
+
 	update: (dt)=>
 		super dt
 
@@ -26,10 +30,9 @@ export class Player extends Actor
 
 		-- Dashing though!
 		if @hit_timer>0
-			sx, sy = @hit_to.x*@speed*0.55, @hit_to.y*@speed*0.55
-			@move(sx*dt, sy*dt)
-			@hit_to.x = math.max(@hit_to.x - 3, 0)
-			@hit_to.y = math.max(@hit_to.y - 3, 0)
+			sx, sy = @hit_to.x*@speed, @hit_to.y*@speed
+			@move(-sx*dt, -sy*dt)
+
 			@hit_timer = math.max(@hit_timer-dt, 0)
 
 		elseif @dash_timer>0
@@ -37,9 +40,13 @@ export class Player extends Actor
 			@move(sx*sx*dt*lume.sign(sx), sy*sy*dt*lume.sign(sy))
 			@dash_timer = math.max(@dash_timer-dt, 0)
 
-			-- Got the ball!
+			-- Steal the ball!
 			orb = @collide_with(@x,@y, "orb")
 			if orb != nil and not orb.evil
+				if orb.following != nil and orb.following !=self
+					print orb.following.__class.__name
+					orb.following\injure!
+
 				orb.rate = 1
 				orb.collides_with = {"solid"}
 				orb.following=self
@@ -96,7 +103,9 @@ export class Player extends Actor
 
 	injure: (x, y)=>
 		if @invulnerable==0 and @dash_timer<=-0.1
-			@scene\camera_shake(2,3)
+			slowdown(0.01)
+
+			@scene\camera_shake(2,1)
 			@invulnerable = 1.5
 			@hit_timer = 0.7
 			@hit_to.x, @hit_to.y = normalize x-@x, y-@y

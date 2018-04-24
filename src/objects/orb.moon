@@ -69,9 +69,14 @@ export class Orb extends Actor
 				@move(@speedX * dt, @speedY * dt)
 
 				if math.abs(@speedX)<=0.1 and math.abs(@speedY)<=0.1
-					@respawn = math.max(@respawn-dt, 0)
+					fade = 1
+					if @scene.player.room.x==@room.x and @scene.player.room.y==@room.y then fade=0.4
+					@respawn = math.max(@respawn-dt * fade, 0)
+
 				if @respawn == 0
-					print "Orb respawned!"
+					@scale=0
+					@add_tween(1, self, {scale: 1}, "outBack")
+
 					@respawn = 5
 					@speedX, @speedY = 0, 0
 					@x, @y = (@scene.player.room.x + 0.5) * data.global.room_size_x, (@scene.player.room.y + 0.5) * data.global.room_size_y
@@ -80,7 +85,7 @@ export class Orb extends Actor
 				if @evil
 					player = @collide_with(@x,@y, "player")
 					if player != nil
-						player\injure()
+						player\injure(@x,@y)
 						@evil = false
 
 				-- is the player around
@@ -96,12 +101,20 @@ export class Orb extends Actor
 		if @evil
 			lg.setColor 1,0,0,1
 		else
-			lg.setColor white
+			if @shooting
+				lg.setColor white
+			else
+				c = math.min(@respawn, 1)
+				lg.setColor c,c,c,1
 
 		if @immune>0
 			lg.setColor 1, 1, math.floor(time*200)%2, 1
 
 		lg.circle "fill", x, y - @z, 5 * @scale
+
+		follow = "NIL"
+		if @following != nil then follow = @following.__class.__name
+		lg.print follow, x, y + 10
 
 	on_collidedX:()=>
 		@speedX = -@speedX

@@ -1,7 +1,7 @@
 export class Attacker extends Actor
 	new:(x,y)=>
 		super(x,y)
-		@max_speed = 50
+		@max_speed = 45
 		@speed = {x:0, y:0}
 		@time = 0
 
@@ -33,7 +33,7 @@ export class Attacker extends Actor
 			@move(-move_x*dt * @max_speed*0.25, -move_y*dt * @max_speed*0.25)
 
 		orb = @collide_with(@x,@y, "orb")
-		if orb != nil and orb.following == nil
+		if orb != nil and orb.following == nil and orb.shooting
 			orb.speedX = -orb.speedX
 			orb.speedY = -orb.speedY
 			@injure!
@@ -41,7 +41,7 @@ export class Attacker extends Actor
 		player = @collide_with(@x,@y, "player")
 		if player != nil
 			player\injure(@x, @y)
-			@stunned = 3
+			@stunned = 5
 		
 		@time += dt * lume.random(0.2,1.8)
 		if @time>8 then @time=0
@@ -58,6 +58,7 @@ export class Attacker extends Actor
 
 	injure:()=>
 		if @invulnerable==0
+			slowdown(0.01)
 			@invulnerable = 0.8
 			@hp -= 1
 			if @hp==0 then @remove_self()

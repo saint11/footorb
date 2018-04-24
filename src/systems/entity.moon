@@ -8,6 +8,8 @@ export class Entity
 
 		@tweens={}
 
+	start:()=>
+		
     update: (dt)=>
     	for i,t in lume.ripairs(@tweens)
     		if t\update(dt)

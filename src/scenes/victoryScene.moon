@@ -1,5 +1,7 @@
 export class VictoryScene extends Scene
 	new: ()=>
+		super!
+		
 		@fade_time_max = 1
 		@fade_time = @fade_time_max
 

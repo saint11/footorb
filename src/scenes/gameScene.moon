@@ -1,5 +1,7 @@
 export class GameScene extends Scene
 	new: ()=>
+		super!
+		
 		@entities = {}
 		@entities_to_add = {}
 		@entities_to_remove = {}
@@ -8,7 +10,10 @@ export class GameScene extends Scene
 		@generator = require("generator")
 		@generator\init(self)
 		@generator\make_dungeon!
-		
+	
+	start: ()=>
+
+
 	draw: ()=>
 		shake_x = lume.random(-@camera.shake_intensity,@camera.shake_intensity) * math.min(@camera.shake_time,1)
 		shake_y = lume.random(-@camera.shake_intensity,@camera.shake_intensity) * math.min(@camera.shake_time,1)
@@ -39,6 +44,7 @@ export class GameScene extends Scene
 		-- add entities
 		for i,e in ipairs(@entities_to_add)
 			lume.push(@entities, e)
+			e\start!
 
 		@entities_to_add = {}
 		@entities_to_remove = {}
@@ -77,7 +83,12 @@ export class GameScene extends Scene
 		lg.setColor(0.2,0.2,0.5,1)
 		lg.rectangle("fill", ui_x, ui_y , w_width, w_height - data.global.room_size_y)
 
-		mm_size = 4
+		mm_size_x = 6
+		mm_size_y = 4
+
+		lg.setColor(0.1,0.1,0.1,1)
+		lg.rectangle("fill",ui_x + 2, ui_y + 2, data.global.dungeon_size_x*(mm_size_x + 1) + 4, (w_height-data.global.room_size_y) - 4)
+
 		for i,room in ipairs(@generator.rooms)
 			if (room.style=="start")
 				lg.setColor(1,0.2,0.5,0.5)
@@ -85,11 +96,14 @@ export class GameScene extends Scene
 				lg.setColor(0.2,1,0.5,0.5)
 			else
 				lg.setColor(0.5,0.5,0.8,0.5)
-			lg.rectangle("fill",ui_x + 2 + room.x*(mm_size+1), ui_y + 2 + room.y*(mm_size+1), mm_size, mm_size)
+			lg.rectangle("fill",ui_x + 2 + room.x*(mm_size_x+1), ui_y + 2 + room.y*(mm_size_y+1), mm_size_x, mm_size_y)
 				
 		x, y = @player.room.x, @player.room.y
 		lg.setColor(1,1,1,0.5)
-		lg.rectangle("fill",ui_x + 2 + x*(mm_size+1), ui_y + 2 + y*(mm_size+1), mm_size, mm_size)
+		lg.rectangle("fill",ui_x + 2 + x*(mm_size_x+1), ui_y + 2 + y*(mm_size_y+1), mm_size_x, mm_size_y)
+
+		for i=1,@player.hp
+			lg.rectangle("fill",ui_x + (mm_size_x + 1)*data.global.dungeon_size_x + i*14, ui_y + 5, 12, 12)
 
 	fade_to:(where, time)=>
 		@add(FadeOut(where, time))

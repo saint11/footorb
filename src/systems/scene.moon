@@ -1,7 +1,8 @@
 export class Scene
 	new: ()=>
-		--do something
+		@started=false
 
+	start:()=>
 	draw: ()=>
 		lg.setFont(data.fonts.min4)
 		lg.print "EMPTY SCENE",10,10

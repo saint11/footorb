@@ -1,5 +1,7 @@
 export class PauseScene extends Scene
 	new: (real_scene)=>
+		super!
+		
 		@real_scene = real_scene
 		@fade_time_max = 0.5
 		@fade_time = @fade_time_max

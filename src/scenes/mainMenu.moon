@@ -1,5 +1,6 @@
 export class MainMenuScene extends Scene
 	new: ()=>
+		super!
 		@createOptions {
 			{
 				text:getText("new_game")
